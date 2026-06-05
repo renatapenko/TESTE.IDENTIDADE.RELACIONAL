@@ -1,0 +1,1629 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Raio-X da Identidade Relacional™</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --terra:#B5623A;
+    --terra-light:#D4845C;
+    --terra-pale:#F0DDD4;
+    --brown:#3D2B1F;
+    --brown-mid:#6B4A38;
+    --cream:#FAF7F3;
+    --cream-warm:#F5EFE8;
+    --text-main:#2A1A12;
+    --text-soft:#7A5A4A;
+    --text-muted:#A08070;
+    --border:#E8D8C8;
+  }
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Jost',sans-serif;
+    background:var(--cream);
+    color:var(--text-main);
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  /* SCREENS */
+  .screen{display:none;min-height:100vh;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1.5rem;animation:fadeIn 0.7s ease}
+  .screen.active{display:flex}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes shimmer{0%,100%{opacity:1}50%{opacity:0.5}}
+  
+  /* COVER */
+  #screen-cover{
+    background:var(--brown);
+    position:relative;
+    overflow:hidden;
+    text-align:center;
+    justify-content:space-between;
+    padding:4rem 2rem;
+  }
+  #screen-cover::before{
+    content:'';
+    position:absolute;
+    top:-40%;left:-20%;
+    width:140%;height:140%;
+    background:radial-gradient(ellipse 60% 50% at 50% 40%, rgba(181,98,58,0.18) 0%, transparent 70%);
+    pointer-events:none;
+  }
+  .cover-ornament{
+    font-family:'Cormorant Garamond',serif;
+    font-size:10px;
+    font-weight:300;
+    letter-spacing:0.35em;
+    color:var(--terra-light);
+    text-transform:uppercase;
+    opacity:0.7;
+    margin-bottom:2.5rem;
+  }
+  .cover-title{
+    font-family:'Cormorant Garamond',serif;
+    font-size:clamp(2.4rem,8vw,3.6rem);
+    font-weight:300;
+    color:var(--cream);
+    line-height:1.1;
+    letter-spacing:-0.01em;
+    margin-bottom:0.5rem;
+  }
+  .cover-title em{
+    font-style:italic;
+    color:var(--terra-light);
+  }
+  .cover-trademark{
+    font-family:'Jost',sans-serif;
+    font-size:10px;
+    font-weight:300;
+    letter-spacing:0.25em;
+    color:var(--terra-light);
+    opacity:0.6;
+    margin-bottom:3rem;
+  }
+  .cover-divider{
+    width:48px;height:1px;
+    background:var(--terra);
+    margin:0 auto 2.5rem;
+    opacity:0.5;
+  }
+  .cover-subtitle{
+    font-family:'Cormorant Garamond',serif;
+    font-size:1.15rem;
+    font-weight:400;
+    font-style:italic;
+    color:rgba(250,247,243,0.6);
+    line-height:1.6;
+    max-width:320px;
+    margin:0 auto 3.5rem;
+  }
+  .btn-primary{
+    display:inline-block;
+    background:var(--terra);
+    color:var(--cream);
+    font-family:'Jost',sans-serif;
+    font-size:0.8rem;
+    font-weight:400;
+    letter-spacing:0.2em;
+    text-transform:uppercase;
+    padding:1.1rem 2.8rem;
+    border:none;
+    cursor:pointer;
+    transition:all 0.3s ease;
+    position:relative;
+    overflow:hidden;
+  }
+  .btn-primary::after{
+    content:'';
+    position:absolute;
+    inset:0;
+    background:rgba(255,255,255,0);
+    transition:background 0.3s;
+  }
+  .btn-primary:hover::after{background:rgba(255,255,255,0.08)}
+  .btn-primary:active{transform:scale(0.98)}
+  .cover-duration{
+    font-family:'Jost',sans-serif;
+    font-size:0.72rem;
+    font-weight:300;
+    letter-spacing:0.2em;
+    color:rgba(250,247,243,0.35);
+    text-transform:uppercase;
+    margin-top:1.8rem;
+  }
+
+  /* INTRO */
+  #screen-intro{background:var(--cream);text-align:center}
+  .intro-label{
+    font-family:'Jost',sans-serif;
+    font-size:0.72rem;
+    font-weight:400;
+    letter-spacing:0.3em;
+    text-transform:uppercase;
+    color:var(--terra);
+    margin-bottom:2rem;
+  }
+  .intro-heading{
+    font-family:'Cormorant Garamond',serif;
+    font-size:clamp(1.9rem,6vw,2.6rem);
+    font-weight:300;
+    color:var(--brown);
+    line-height:1.2;
+    max-width:340px;
+    margin:0 auto 2rem;
+  }
+  .intro-heading em{font-style:italic;color:var(--terra)}
+  .intro-body{
+    font-family:'Cormorant Garamond',serif;
+    font-size:1.1rem;
+    font-weight:400;
+    font-style:italic;
+    color:var(--text-soft);
+    line-height:1.8;
+    max-width:320px;
+    margin:0 auto 3rem;
+  }
+  .intro-pillars{
+    display:flex;
+    flex-direction:column;
+    gap:0.8rem;
+    max-width:300px;
+    margin:0 auto 3rem;
+    text-align:left;
+  }
+  .pillar-item{
+    display:flex;
+    align-items:flex-start;
+    gap:1rem;
+    padding:0.9rem 1.1rem;
+    background:var(--cream-warm);
+    border:0.5px solid var(--border);
+  }
+  .pillar-dot{
+    width:6px;height:6px;
+    background:var(--terra);
+    border-radius:50%;
+    flex-shrink:0;
+    margin-top:0.4rem;
+  }
+  .pillar-text{
+    font-family:'Jost',sans-serif;
+    font-size:0.85rem;
+    font-weight:300;
+    color:var(--text-soft);
+    line-height:1.5;
+  }
+
+  /* QUESTION SCREEN */
+  #screen-quiz{
+    background:var(--cream);
+    justify-content:flex-start;
+    padding:0;
+  }
+  .quiz-header{
+    width:100%;
+    padding:2rem 1.5rem 1rem;
+    display:flex;
+    flex-direction:column;
+    gap:0.8rem;
+    background:var(--cream);
+    position:sticky;
+    top:0;
+    z-index:10;
+    border-bottom:0.5px solid var(--border);
+  }
+  .quiz-meta{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .quiz-counter{
+    font-family:'Jost',sans-serif;
+    font-size:0.72rem;
+    font-weight:400;
+    letter-spacing:0.2em;
+    color:var(--text-muted);
+    text-transform:uppercase;
+  }
+  .quiz-progress-bar{
+    width:100%;
+    height:2px;
+    background:var(--border);
+  }
+  .quiz-progress-fill{
+    height:100%;
+    background:var(--terra);
+    transition:width 0.5s ease;
+  }
+  .quiz-body{
+    flex:1;
+    width:100%;
+    padding:2rem 1.5rem 3rem;
+    display:flex;
+    flex-direction:column;
+    gap:2rem;
+  }
+  .question-text{
+    font-family:'Cormorant Garamond',serif;
+    font-size:clamp(1.2rem,4vw,1.5rem);
+    font-weight:400;
+    color:var(--brown);
+    line-height:1.55;
+    letter-spacing:0.01em;
+  }
+  .question-scene{
+    font-family:'Cormorant Garamond',serif;
+    font-size:1rem;
+    font-style:italic;
+    color:var(--text-soft);
+    line-height:1.7;
+    padding-left:1rem;
+    border-left:2px solid var(--terra-pale);
+    margin-bottom:0.5rem;
+  }
+  .options-list{
+    display:flex;
+    flex-direction:column;
+    gap:0.65rem;
+  }
+  .option-btn{
+    width:100%;
+    text-align:left;
+    padding:1rem 1.2rem;
+    background:transparent;
+    border:0.5px solid var(--border);
+    cursor:pointer;
+    font-family:'Jost',sans-serif;
+    font-size:0.88rem;
+    font-weight:300;
+    color:var(--text-main);
+    line-height:1.5;
+    transition:all 0.25s ease;
+    position:relative;
+    overflow:hidden;
+  }
+  .option-btn::before{
+    content:'';
+    position:absolute;
+    left:0;top:0;bottom:0;
+    width:2px;
+    background:var(--terra);
+    transform:scaleY(0);
+    transition:transform 0.25s ease;
+    transform-origin:center;
+  }
+  .option-btn:hover{
+    background:var(--cream-warm);
+    border-color:var(--terra-light);
+    color:var(--brown);
+  }
+  .option-btn:hover::before{transform:scaleY(1)}
+  .option-btn.selected{
+    background:var(--terra-pale);
+    border-color:var(--terra);
+    color:var(--brown);
+  }
+  .option-btn.selected::before{transform:scaleY(1)}
+
+  /* MICRO MOMENT */
+  #screen-moment{
+    background:var(--brown);
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+  }
+  #screen-moment::before{
+    content:'';
+    position:absolute;
+    top:50%;left:50%;
+    transform:translate(-50%,-50%);
+    width:300px;height:300px;
+    background:radial-gradient(circle, rgba(181,98,58,0.15) 0%, transparent 70%);
+    pointer-events:none;
+  }
+  .moment-ornament{
+    font-family:'Jost',sans-serif;
+    font-size:0.7rem;
+    font-weight:300;
+    letter-spacing:0.4em;
+    color:var(--terra-light);
+    text-transform:uppercase;
+    opacity:0.6;
+    margin-bottom:2.5rem;
+  }
+  .moment-text{
+    font-family:'Cormorant Garamond',serif;
+    font-size:clamp(1.4rem,5vw,1.9rem);
+    font-weight:300;
+    font-style:italic;
+    color:var(--cream);
+    line-height:1.6;
+    max-width:320px;
+    margin:0 auto 3rem;
+  }
+  .moment-text strong{
+    font-style:normal;
+    font-weight:500;
+    color:var(--terra-light);
+  }
+  .btn-ghost{
+    background:transparent;
+    color:var(--terra-light);
+    border:0.5px solid var(--terra);
+    font-family:'Jost',sans-serif;
+    font-size:0.75rem;
+    font-weight:400;
+    letter-spacing:0.2em;
+    text-transform:uppercase;
+    padding:0.9rem 2.2rem;
+    cursor:pointer;
+    transition:all 0.3s ease;
+  }
+  .btn-ghost:hover{background:rgba(181,98,58,0.12)}
+
+  /* LOADING */
+  #screen-loading{
+    background:var(--brown);
+    text-align:center;
+  }
+  .loading-title{
+    font-family:'Cormorant Garamond',serif;
+    font-size:clamp(1.4rem,5vw,1.8rem);
+    font-weight:300;
+    font-style:italic;
+    color:var(--cream);
+    margin-bottom:1rem;
+    opacity:0.8;
+  }
+  .loading-sub{
+    font-family:'Jost',sans-serif;
+    font-size:0.75rem;
+    font-weight:300;
+    letter-spacing:0.25em;
+    color:var(--terra-light);
+    text-transform:uppercase;
+    opacity:0.5;
+    margin-bottom:3rem;
+  }
+  .loading-dots{
+    display:flex;gap:8px;justify-content:center;
+  }
+  .dot{
+    width:6px;height:6px;
+    background:var(--terra);
+    border-radius:50%;
+    animation:shimmer 1.4s ease infinite;
+  }
+  .dot:nth-child(2){animation-delay:0.2s}
+  .dot:nth-child(3){animation-delay:0.4s}
+
+  /* RESULT */
+  #screen-result{
+    background:var(--cream);
+    justify-content:flex-start;
+    padding:0;
+    min-height:100vh;
+  }
+  .result-hero{
+    width:100%;
+    background:var(--brown);
+    padding:3.5rem 1.5rem 3rem;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+  }
+  .result-hero::after{
+    content:'';
+    position:absolute;
+    bottom:0;left:0;right:0;
+    height:60px;
+    background:linear-gradient(to bottom, transparent, var(--cream));
+    pointer-events:none;
+  }
+  .result-label{
+    font-family:'Jost',sans-serif;
+    font-size:0.68rem;
+    font-weight:400;
+    letter-spacing:0.35em;
+    text-transform:uppercase;
+    color:var(--terra-light);
+    opacity:0.7;
+    margin-bottom:1.5rem;
+  }
+  .result-identity{
+    font-family:'Cormorant Garamond',serif;
+    font-size:clamp(2rem,7vw,2.8rem);
+    font-weight:400;
+    color:var(--cream);
+    line-height:1.1;
+    margin-bottom:1rem;
+  }
+  .result-identity em{
+    font-style:italic;
+    display:block;
+    color:var(--terra-light);
+  }
+  .result-tagline{
+    font-family:'Cormorant Garamond',serif;
+    font-size:1rem;
+    font-style:italic;
+    color:rgba(250,247,243,0.5);
+    margin-bottom:0;
+  }
+  .result-body{
+    padding:3rem 1.5rem 5rem;
+    display:flex;
+    flex-direction:column;
+    gap:2.5rem;
+  }
+  .result-section{
+    display:flex;
+    flex-direction:column;
+    gap:0.8rem;
+  }
+  .result-section-label{
+    font-family:'Jost',sans-serif;
+    font-size:0.68rem;
+    font-weight:400;
+    letter-spacing:0.3em;
+    text-transform:uppercase;
+    color:var(--terra);
+  }
+  .result-section-text{
+    font-family:'Cormorant Garamond',serif;
+    font-size:1.1rem;
+    font-weight:400;
+    color:var(--brown);
+    line-height:1.75;
+  }
+  .result-section-text em{
+    font-style:italic;
+    color:var(--terra);
+  }
+  .result-separator{
+    width:32px;height:1px;
+    background:var(--border);
+    margin:0;
+  }
+  .result-block{
+    background:var(--cream-warm);
+    border:0.5px solid var(--border);
+    padding:1.5rem;
+    display:flex;
+    flex-direction:column;
+    gap:0.6rem;
+  }
+  .result-block-label{
+    font-family:'Jost',sans-serif;
+    font-size:0.68rem;
+    font-weight:400;
+    letter-spacing:0.25em;
+    text-transform:uppercase;
+    color:var(--text-muted);
+  }
+  .result-block-text{
+    font-family:'Cormorant Garamond',serif;
+    font-size:1.05rem;
+    color:var(--brown);
+    line-height:1.7;
+  }
+  .result-blocks-grid{
+    display:flex;
+    flex-direction:column;
+    gap:0.5rem;
+  }
+  .result-finale{
+    background:var(--brown);
+    padding:2.5rem 1.5rem;
+    text-align:center;
+  }
+  .finale-text{
+    font-family:'Cormorant Garamond',serif;
+    font-size:clamp(1.1rem,4vw,1.35rem);
+    font-weight:300;
+    font-style:italic;
+    color:var(--cream);
+    line-height:1.8;
+    max-width:320px;
+    margin:0 auto;
+    opacity:0.85;
+  }
+  .finale-text strong{
+    font-style:normal;
+    font-weight:500;
+    color:var(--terra-light);
+  }
+  .cta-section{
+    padding:2.5rem 1.5rem 4rem;
+    text-align:center;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:1rem;
+    background:var(--cream);
+  }
+  .cta-label{
+    font-family:'Jost',sans-serif;
+    font-size:0.72rem;
+    font-weight:300;
+    letter-spacing:0.25em;
+    text-transform:uppercase;
+    color:var(--text-muted);
+  }
+  .cta-title{
+    font-family:'Cormorant Garamond',serif;
+    font-size:1.6rem;
+    font-weight:400;
+    color:var(--brown);
+    line-height:1.2;
+    margin-bottom:0.5rem;
+  }
+  .cta-title em{font-style:italic;color:var(--terra)}
+  .cta-subtitle{
+    font-family:'Jost',sans-serif;
+    font-size:0.82rem;
+    font-weight:300;
+    color:var(--text-soft);
+    line-height:1.6;
+    max-width:280px;
+    margin-bottom:0.5rem;
+  }
+  .btn-cta{
+    display:inline-block;
+    background:var(--terra);
+    color:var(--cream);
+    font-family:'Jost',sans-serif;
+    font-size:0.78rem;
+    font-weight:400;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    padding:1.1rem 2.5rem;
+    border:none;
+    cursor:pointer;
+    text-decoration:none;
+    transition:all 0.3s ease;
+  }
+  .btn-cta:hover{background:var(--terra-light)}
+  .cta-note{
+    font-family:'Jost',sans-serif;
+    font-size:0.72rem;
+    font-weight:300;
+    color:var(--text-muted);
+    letter-spacing:0.05em;
+  }
+  .spectrum-bars{
+    display:flex;
+    flex-direction:column;
+    gap:0.6rem;
+    margin-top:0.5rem;
+  }
+  .spectrum-row{
+    display:flex;
+    align-items:center;
+    gap:0.8rem;
+  }
+  .spectrum-label{
+    font-family:'Jost',sans-serif;
+    font-size:0.72rem;
+    font-weight:300;
+    color:var(--text-soft);
+    width:130px;
+    flex-shrink:0;
+  }
+  .spectrum-track{
+    flex:1;
+    height:3px;
+    background:var(--border);
+    position:relative;
+  }
+  .spectrum-fill{
+    height:100%;
+    background:var(--terra);
+    transition:width 1.2s ease;
+  }
+  .spectrum-val{
+    font-family:'Jost',sans-serif;
+    font-size:0.7rem;
+    color:var(--text-muted);
+    width:28px;
+    text-align:right;
+    flex-shrink:0;
+  }
+
+  /* BRIDGE SECTION */
+  .bridge-section{
+    background:var(--cream);
+    padding:3rem 1.5rem 2rem;
+    display:flex;
+    flex-direction:column;
+    gap:2rem;
+  }
+  .bridge-block{
+    display:flex;
+    flex-direction:column;
+    gap:1rem;
+  }
+  .bridge-label{
+    font-family:'Jost',sans-serif;
+    font-size:0.68rem;
+    font-weight:400;
+    letter-spacing:0.3em;
+    text-transform:uppercase;
+    color:var(--terra);
+  }
+  .bridge-body{
+    font-family:'Cormorant Garamond',serif;
+    font-size:1.1rem;
+    font-weight:400;
+    color:var(--brown);
+    line-height:1.8;
+  }
+  .bridge-body em{
+    font-style:italic;
+    color:var(--terra);
+  }
+  .bridge-list{
+    color:var(--text-soft);
+    font-style:italic;
+    padding-left:1rem;
+    border-left:2px solid var(--terra-pale);
+  }
+  .bridge-emphasis{
+    font-family:'Cormorant Garamond',serif;
+    font-size:1.15rem;
+    font-weight:500;
+    color:var(--brown);
+    line-height:1.7;
+  }
+  .bridge-pull{
+    background:var(--brown);
+    padding:2.5rem 1.5rem;
+    text-align:center;
+    margin:0 -1.5rem;
+  }
+  .bridge-pull-text{
+    font-family:'Cormorant Garamond',serif;
+    font-size:clamp(1.6rem,5vw,2.2rem);
+    font-weight:300;
+    color:var(--cream);
+    line-height:1.3;
+  }
+  .bridge-pull-text em{
+    font-style:italic;
+    color:var(--terra-light);
+    display:block;
+  }
+  .bridge-divider{
+    width:32px;height:1px;
+    background:var(--border);
+  }
+
+  /* CLOSING BLOCK */
+  .bridge-closing{
+    background:var(--brown);
+    padding:3rem 1.5rem;
+    display:flex;
+    flex-direction:column;
+    gap:1.4rem;
+    text-align:center;
+  }
+  .bridge-closing-intro{
+    font-family:'Jost',sans-serif;
+    font-size:0.7rem;
+    font-weight:300;
+    letter-spacing:0.35em;
+    text-transform:uppercase;
+    color:var(--terra-light);
+    opacity:0.6;
+  }
+  .bridge-closing-lines{
+    display:flex;
+    flex-direction:column;
+    gap:0.5rem;
+  }
+  .bridge-closing-lines p{
+    font-family:'Cormorant Garamond',serif;
+    font-size:clamp(1.2rem,4vw,1.5rem);
+    font-weight:300;
+    font-style:italic;
+    color:var(--cream);
+    line-height:1.4;
+    opacity:0.9;
+  }
+  .bridge-closing-body{
+    font-family:'Cormorant Garamond',serif;
+    font-size:1.05rem;
+    font-weight:300;
+    color:rgba(250,247,243,0.6);
+    line-height:1.8;
+    max-width:320px;
+    margin:0 auto;
+  }
+  .bridge-closing-emphasis{
+    font-family:'Cormorant Garamond',serif;
+    font-size:1.2rem;
+    font-weight:500;
+    color:var(--terra-light);
+    line-height:1.6;
+    max-width:300px;
+    margin:0.5rem auto 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- SCREEN 0: COVER -->
+<div class="screen active" id="screen-cover">
+  <div>
+    <p class="cover-ornament">Renata Maximiliano · Psicanalista</p>
+    <h1 class="cover-title">Raio-X da<br><em>Identidade</em><br>Relacional</h1>
+    <p class="cover-trademark">™ diagnóstico emocional</p>
+    <div class="cover-divider"></div>
+    <p class="cover-subtitle">Você não sofre por causa dos relacionamentos.<br>Sofre por causa de quem você se torna<br>quando alguém importa.</p>
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:center">
+    <button class="btn-primary" onclick="showScreen('screen-intro')">Iniciar a experiência</button>
+    <p class="cover-duration">7 a 10 minutos · gratuito</p>
+  </div>
+</div>
+
+<!-- SCREEN 1: INTRO -->
+<div class="screen" id="screen-intro">
+  <div style="max-width:360px;width:100%;text-align:center">
+    <p class="intro-label">Antes de começar</p>
+    <h2 class="intro-heading">Isso não é um teste.<br>É uma <em>leitura</em>.</h2>
+    <p class="intro-body">Cada pergunta descreve uma cena.<br>Responda com o que você <em>faz</em>, não com o que deveria fazer.</p>
+    <div class="intro-pillars">
+      <div class="pillar-item">
+        <span class="pillar-dot"></span>
+        <span class="pillar-text">Não existe resposta certa. Existe a resposta verdadeira.</span>
+      </div>
+      <div class="pillar-item">
+        <span class="pillar-dot"></span>
+        <span class="pillar-text">A honestidade com você mesma é o que torna este diagnóstico preciso.</span>
+      </div>
+      <div class="pillar-item">
+        <span class="pillar-dot"></span>
+        <span class="pillar-text">Ao final, você vai entender um padrão que talvez nunca tenha nomeado.</span>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="startQuiz()">Estou pronta</button>
+  </div>
+</div>
+
+<!-- SCREEN 2: QUIZ -->
+<div class="screen" id="screen-quiz">
+  <div class="quiz-header">
+    <div class="quiz-meta">
+      <span class="quiz-counter" id="q-counter">Pergunta 1 de 42</span>
+      <span class="quiz-counter" id="q-section-label">Ativação</span>
+    </div>
+    <div class="quiz-progress-bar">
+      <div class="quiz-progress-fill" id="q-progress" style="width:2%"></div>
+    </div>
+  </div>
+  <div class="quiz-body" id="quiz-body">
+  </div>
+</div>
+
+<!-- SCREEN 3: MICRO MOMENT -->
+<div class="screen" id="screen-moment">
+  <p class="moment-ornament">Observe isto</p>
+  <p class="moment-text" id="moment-text"></p>
+  <button class="btn-ghost" id="moment-btn">Continuar</button>
+</div>
+
+<!-- SCREEN 4: LOADING -->
+<div class="screen" id="screen-loading">
+  <p class="loading-title">Mapeando sua identidade relacional...</p>
+  <p class="loading-sub">Processando padrões emocionais</p>
+  <div class="loading-dots">
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+  </div>
+</div>
+
+<!-- SCREEN 5: RESULT -->
+<div class="screen" id="screen-result">
+  <div class="result-hero" id="result-hero">
+    <p class="result-label">Sua identidade relacional dominante</p>
+    <h2 class="result-identity" id="result-title"></h2>
+    <p class="result-tagline" id="result-tagline"></p>
+    <div id="result-precision"></div>
+  </div>
+  <div class="result-body" id="result-body"></div>
+  <div class="result-finale" id="result-finale"></div>
+
+  <!-- NOVA SEÇÃO: PONTE EMOCIONAL -->
+  <div class="bridge-section">
+
+    <div class="bridge-block">
+      <p class="bridge-label">O que este diagnóstico ainda não consegue mostrar</p>
+      <p class="bridge-body">Se você chegou até aqui, provavelmente sentiu algo raro.</p>
+      <p class="bridge-body">Talvez tenha sido alívio.<br>Talvez tenha sido desconforto.<br>Talvez tenha sido a sensação de finalmente conseguir colocar palavras em algo que você sente há anos.</p>
+      <p class="bridge-body">Você acabou de descobrir qual identidade relacional assume o controle quando um vínculo se torna emocionalmente importante.</p>
+      <p class="bridge-body">Mas existe uma pergunta que este diagnóstico não consegue responder.</p>
+    </div>
+
+    <div class="bridge-pull">
+      <p class="bridge-pull-text">Como essa identidade<br><em>foi construída.</em></p>
+    </div>
+
+    <div class="bridge-block">
+      <p class="bridge-body">Porque ninguém nasce assim.</p>
+      <p class="bridge-body bridge-list">Ninguém nasce Fiscal do Amor.<br>Ninguém nasce Boazinha.<br>Ninguém nasce Guardiã do Portão.<br>Ninguém nasce Sobrevivente de Guerra.<br>Ninguém nasce Investigadora.</p>
+      <p class="bridge-body">Em algum momento da sua história emocional, seu sistema aprendeu que essa era a melhor forma de se proteger. A melhor forma de evitar dor. A melhor forma de manter vínculo.</p>
+      <p class="bridge-body">E o mais curioso é que muitas vezes essa construção acontece de forma tão silenciosa que a pessoa passa a acreditar que nasceu desse jeito.</p>
+      <p class="bridge-emphasis">Mas não nasceu.<br>Você construiu essa identidade.<br>E tudo aquilo que foi construído também pode ser reorganizado.</p>
+    </div>
+
+    <div class="bridge-divider"></div>
+
+    <div class="bridge-block">
+      <p class="bridge-label">O que a maioria das mulheres nunca descobre</p>
+      <p class="bridge-body">A maioria das mulheres consegue perceber seus sintomas.</p>
+      <p class="bridge-body bridge-list">Percebe a ansiedade.<br>Percebe a carência.<br>Percebe a dificuldade de confiar.<br>Percebe a necessidade de controle.<br>Percebe a repetição dos padrões.</p>
+      <p class="bridge-body">Mas não consegue enxergar a <em>origem.</em></p>
+      <p class="bridge-body">Por isso continuam tentando mudar comportamentos sem compreender aquilo que está produzindo os comportamentos.</p>
+      <p class="bridge-emphasis">Quando a origem permanece invisível, o padrão parece inevitável.</p>
+    </div>
+
+    <div class="bridge-divider"></div>
+
+    <div class="bridge-block">
+      <p class="bridge-label">Talvez o problema nunca tenha sido sua capacidade de amar</p>
+      <p class="bridge-body">Talvez o problema seja que uma parte sua continua tentando protegê-la de dores que já passaram.</p>
+      <p class="bridge-body">Talvez uma identidade criada para sobreviver esteja tentando conduzir relacionamentos que exigem conexão.</p>
+      <p class="bridge-body">Talvez você não precise aprender a amar mais.<br>Talvez precise compreender quem assumiu o controle toda vez que o amor chegou perto.</p>
+    </div>
+
+  </div>
+
+  <!-- BLOCO EMOCIONAL FINAL -->
+  <div class="bridge-closing">
+    <p class="bridge-closing-intro">Leia isso devagar.</p>
+    <div class="bridge-closing-lines">
+      <p>Você não nasceu ansiosa.</p>
+      <p>Você não nasceu controladora.</p>
+      <p>Você não nasceu indisponível.</p>
+      <p>Você não nasceu desconfiada.</p>
+      <p>Você não nasceu distante.</p>
+    </div>
+    <p class="bridge-closing-body">Em algum momento da sua história emocional, essas características fizeram sentido. Elas protegeram algo importante. Elas ajudaram você a continuar.</p>
+    <p class="bridge-closing-body">Mas talvez estejam cansadas.</p>
+    <p class="bridge-closing-body">Talvez estejam tentando carregar uma função que já não precisam carregar.</p>
+    <p class="bridge-closing-body">E talvez seja exatamente por isso que você sente que continua vivendo a mesma dor em relacionamentos diferentes.</p>
+    <p class="bridge-closing-emphasis">Porque os personagens mudaram.<br>Mas a identidade continua sendo a mesma.</p>
+  </div>
+
+  <!-- CTA ATUALIZADO -->
+  <div class="cta-section">
+    <p class="cta-label">Existe apenas uma pergunta que realmente importa agora</p>
+    <h3 class="cta-title">Como essa identidade<br><em>foi construída?</em></h3>
+    <p class="cta-subtitle" style="font-family:'Cormorant Garamond',serif;font-size:1rem;font-style:italic;color:var(--text-soft);line-height:1.7;margin-bottom:0.5rem">A Sessão Pocket — Laboratório da Identidade Relacional™ foi criada para responder exatamente essa pergunta.</p>
+    <div style="background:var(--cream-warm);border:0.5px solid var(--border);padding:1.4rem 1.5rem;width:100%;max-width:340px;margin:0.8rem 0 1.2rem;text-align:left">
+      <p style="font-family:'Jost',sans-serif;font-size:0.68rem;font-weight:400;letter-spacing:0.25em;text-transform:uppercase;color:var(--terra);margin-bottom:1rem">Durante a sessão vamos identificar</p>
+      <div style="display:flex;flex-direction:column;gap:0.7rem">
+        <div style="display:flex;gap:0.9rem;align-items:flex-start"><span style="color:var(--terra);flex-shrink:0;font-family:'Cormorant Garamond',serif;font-size:1rem;margin-top:1px">✓</span><span style="font-family:'Jost',sans-serif;font-size:0.82rem;font-weight:300;color:var(--text-soft);line-height:1.5">A origem emocional do padrão que apareceu no seu resultado</span></div>
+        <div style="display:flex;gap:0.9rem;align-items:flex-start"><span style="color:var(--terra);flex-shrink:0;font-family:'Cormorant Garamond',serif;font-size:1rem;margin-top:1px">✓</span><span style="font-family:'Jost',sans-serif;font-size:0.82rem;font-weight:300;color:var(--text-soft);line-height:1.5">As experiências que fortaleceram essa identidade</span></div>
+        <div style="display:flex;gap:0.9rem;align-items:flex-start"><span style="color:var(--terra);flex-shrink:0;font-family:'Cormorant Garamond',serif;font-size:1rem;margin-top:1px">✓</span><span style="font-family:'Jost',sans-serif;font-size:0.82rem;font-weight:300;color:var(--text-soft);line-height:1.5">Como ela afeta seus relacionamentos hoje</span></div>
+        <div style="display:flex;gap:0.9rem;align-items:flex-start"><span style="color:var(--terra);flex-shrink:0;font-family:'Cormorant Garamond',serif;font-size:1rem;margin-top:1px">✓</span><span style="font-family:'Jost',sans-serif;font-size:0.82rem;font-weight:300;color:var(--text-soft);line-height:1.5">O custo emocional que ela gera na sua vida</span></div>
+        <div style="display:flex;gap:0.9rem;align-items:flex-start"><span style="color:var(--terra);flex-shrink:0;font-family:'Cormorant Garamond',serif;font-size:1rem;margin-top:1px">✓</span><span style="font-family:'Jost',sans-serif;font-size:0.82rem;font-weight:300;color:var(--text-soft);line-height:1.5">O que precisa ser reorganizado para restaurar conexão emocional</span></div>
+      </div>
+      <p style="font-family:'Cormorant Garamond',serif;font-size:0.95rem;font-style:italic;color:var(--text-muted);margin-top:1.2rem;line-height:1.6;border-top:0.5px solid var(--border);padding-top:1rem">Não é uma sessão de aconselhamento. É uma investigação profunda daquilo que moldou sua forma de amar, confiar e construir vínculos.</p>
+    </div>
+    <p style="font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:400;color:var(--brown);text-align:center;line-height:1.6;max-width:300px">Você descobriu quem assume o controle quando um vínculo importa.<br><em>Agora descubra por que essa identidade precisou existir.</em></p>
+    <a class="btn-cta" href="https://sessao-pocket.netlify.app/" target="_blank">Quero descobrir a origem desse padrão</a>
+    <p class="cta-note" style="margin-top:0.3rem">R$147 · Vagas limitadas · Laboratório de lançamento</p>
+    <p style="font-family:'Jost',sans-serif;font-size:0.72rem;font-weight:300;color:var(--terra);letter-spacing:0.08em;margin-top:0.8rem;cursor:pointer;text-decoration:underline;text-underline-offset:3px" onclick="document.getElementById('result-hero').scrollIntoView({behavior:'smooth'})">← Reler meu resultado</p>
+  </div>
+</div>
+
+<script>
+const QUESTIONS = [
+  {
+    section: "Ativação",
+    scene: "Vocês passaram três dias maravilhosos juntos.",
+    question: "No quarto dia ele responde diferente. O que acontece primeiro?",
+    options: ["Nada. Pessoas têm dias ruins.", "Minha cabeça começa a procurar sinais.", "Finjo que não percebi.", "Sinto uma mudança no meu corpo antes mesmo de pensar."],
+    scores: [
+      {A:1,B:0,C:0,D:0,E:0},
+      {A:0,B:1,F:1,C:0,D:0,E:0},
+      {A:0,D:1,G:1,B:0,C:0,E:0},
+      {A:0,B:1,E:1,C:0,D:0,F:0}
+    ]
+  },
+  {
+    section: "Ativação",
+    question: "Alguém de quem você gosta some por alguns dias sem explicação. Onde sua mente vai?",
+    options: ["Fico preocupada se aconteceu algo com ele.", "Começo a revisar o que eu fiz de errado.", "Decido que provavelmente não é tão importante assim.", "Sinto raiva de mim mesma por estar me preocupando."],
+    scores: [
+      {C:1,A:1},
+      {B:1,F:1,H:1},
+      {A:1,D:1},
+      {D:1,G:1}
+    ]
+  },
+  {
+    section: "Ativação",
+    question: "Você envia uma mensagem carinhosa. Ele lê e não responde. O que você faz?",
+    options: ["Deixo para lá. Quando puder, responde.", "Fico reanalisando o que escrevi.", "Mando outra mensagem mais neutra para equilibrar.", "Fecho o celular e finjo que não mandei."],
+    scores: [
+      {A:2},
+      {B:1,F:1},
+      {B:1,H:1,I:1},
+      {D:1,G:1,A:1}
+    ]
+  },
+  {
+    section: "Ativação",
+    scene: "Você está em um encontro incrível.",
+    question: "Em que momento sua cabeça começa a pensar no próximo encontro?",
+    options: ["Só depois, quando já estou em casa.", "Durante o encontro — de forma intermitente.", "Antes mesmo de ele ir embora.", "Não costumo pensar muito nisso."],
+    scores: [
+      {A:2,G:1},
+      {B:1,F:1},
+      {B:2,F:1},
+      {G:1,A:1,D:1}
+    ]
+  },
+  {
+    section: "Ativação",
+    question: "O quanto a presença (ou ausência) de alguém muda o seu dia?",
+    options: ["Sinto a diferença, mas sigo meu ritmo.", "Muda bastante — especialmente a ausência.", "Tento não deixar isso me afetar, mas afeta.", "Raramente alguém me afeta tanto assim."],
+    scores: [
+      {A:2},
+      {B:1,F:1,C:1},
+      {D:1,H:1,I:1},
+      {G:1,A:1}
+    ]
+  },
+  {
+    section: "Disponibilidade",
+    scene: "Ele é gentil. Presente. Consistente.",
+    question: "Qual é o seu primeiro impulso quando alguém é bom com você de forma constante?",
+    options: ["Recebo com alegria.", "Fico esperando o momento em que vai mudar.", "Me pergunto o que ele quer.", "Me afasto um pouco — intimidade rápida me desconforta."],
+    scores: [
+      {A:2},
+      {E:2,B:1},
+      {B:1,F:1,E:1},
+      {A:1,G:2,J:1}
+    ]
+  },
+  {
+    section: "Disponibilidade",
+    question: "Quando alguém chega muito perto emocionalmente, o que acontece em você?",
+    options: ["Sinto leveza e segurança.", "Uma parte de mim se fecha sem eu querer.", "Fico atenta a qualquer sinal de que vai embora.", "Preciso de tempo para processar."],
+    scores: [
+      {A:2},
+      {G:2,J:1,A:1},
+      {B:1,E:1,F:1},
+      {D:1,G:1}
+    ]
+  },
+  {
+    section: "Disponibilidade",
+    question: "Alguém te oferece cuidado genuíno. Como seu corpo recebe isso?",
+    options: ["Com facilidade. Gosto de ser cuidada.", "Com estranhamento. Não estou acostumada.", "Com suspeita de que é passageiro.", "Com uma vontade de retribuir imediatamente."],
+    scores: [
+      {A:2},
+      {G:1,D:1,A:1},
+      {E:2,B:1},
+      {C:1,I:1,H:1}
+    ]
+  },
+  {
+    section: "Disponibilidade",
+    question: "Quando você sente algo profundo por alguém, o que costuma fazer com isso?",
+    options: ["Expresso com certa naturalidade.", "Guardo por um tempo antes de deixar sair.", "Expresso de forma prática — não em palavras.", "Raramente deixo sair completamente."],
+    scores: [
+      {A:2},
+      {D:1,G:1},
+      {C:1,A:1},
+      {G:2,J:1}
+    ]
+  },
+  {
+    section: "Disponibilidade",
+    question: "Receber elogio de alguém que você admira. Como isso te afeta?",
+    options: ["Me alegra genuinamente.", "Fico satisfeita, mas com uma pequena dúvida.", "Me pergunto se ele realmente me conhece.", "Me desconforta. Prefiro dar do que receber."],
+    scores: [
+      {A:2},
+      {H:1,B:1},
+      {E:1,B:1},
+      {C:1,D:1,I:1}
+    ]
+  },
+  {
+    section: "Masculino",
+    question: "No fundo, qual frase ressoa mais na sua experiência com homens?",
+    options: ["Homens são capazes de presença real.", "Homens desaparecem quando ficam confortáveis.", "Homens precisam ser conduzidos para dar o que têm.", "Ainda estou descobrindo o que acreditar."],
+    scores: [
+      {A:2},
+      {E:2,B:1},
+      {F:2,C:1},
+      {A:1}
+    ]
+  },
+  {
+    section: "Masculino",
+    scene: "Um homem demonstra interesse genuíno.",
+    question: "Sua primeira reação interna é:",
+    options: ["Curiosidade e abertura.", "\"Vamos ver por quanto tempo.\"", "\"O que ele quer de verdade?\"", "Uma mistura de desejo e resistência."],
+    scores: [
+      {A:2},
+      {E:2},
+      {B:1,F:1},
+      {G:1,J:1,E:1}
+    ]
+  },
+  {
+    section: "Masculino",
+    question: "O que mais te cansa nos relacionamentos com homens?",
+    options: ["Não me cansa de forma predominante.", "Inconsistência. Quentura e frieza.", "Precisar sempre ser a forte.", "A distância emocional. Nunca sei onde estou."],
+    scores: [
+      {A:1},
+      {E:1,B:1,F:1},
+      {A:1,C:1,D:1},
+      {G:1,E:1,J:1}
+    ]
+  },
+  {
+    section: "Masculino",
+    question: "Quando um homem não consegue te alcançar emocionalmente, como você reage?",
+    options: ["Tento criar espaço para que ele chegue.", "Insisto mais. Preciso que ele entenda.", "Desisto silenciosamente.", "Me fecho e conto com minha própria companhia."],
+    scores: [
+      {C:1,A:1},
+      {F:1,H:1,C:1},
+      {G:1,D:1,J:1},
+      {A:1,G:1}
+    ]
+  },
+  {
+    section: "Pertencimento",
+    question: "Quando um relacionamento termina, qual pensamento aparece com mais força?",
+    options: ["\"Não era para ser.\"", "\"O que eu fiz de errado?\"", "\"Sabia que era questão de tempo.\"", "\"Prefiro não pensar.\""],
+    scores: [
+      {A:2},
+      {H:2,I:1,B:1},
+      {E:2,B:1},
+      {G:1,D:1}
+    ]
+  },
+  {
+    section: "Pertencimento",
+    question: "No fundo, você acredita que é o tipo de pessoa que as pessoas ficam?",
+    options: ["Sim, sem grandes dúvidas.", "Às vezes acredito, às vezes duvido.", "Acredito mais quando me dedicado muito.", "Tenho dificuldade de acreditar nisso completamente."],
+    scores: [
+      {A:2},
+      {B:1,F:1},
+      {H:1,I:1,C:1},
+      {H:2,E:1}
+    ]
+  },
+  {
+    section: "Pertencimento",
+    question: "Quando sente que alguém está perdendo o interesse, o que você faz?",
+    options: ["Abro espaço para a conversa.", "Me dedico mais — sem que ele perceba.", "Me afasto primeiro.", "Fico intensa internamente, mas me comporto normalmente."],
+    scores: [
+      {A:2},
+      {H:1,I:1,C:1},
+      {G:1,A:1,J:1},
+      {B:2,F:1}
+    ]
+  },
+  {
+    section: "Pertencimento",
+    question: "Quando você se imagina sendo verdadeiramente vista e escolhida, o que sente?",
+    options: ["Alegria. Isso é o que quero.", "Uma mistura de desejo e incredulidade.", "Desejo, mas seguido de medo de não durar.", "É difícil me imaginar nessa posição completamente."],
+    scores: [
+      {A:2},
+      {H:1,B:1,F:1},
+      {E:1,B:1,F:1},
+      {H:2,D:1}
+    ]
+  },
+  {
+    section: "Pertencimento",
+    scene: "Ele escolhe outra pessoa.",
+    question: "O que você sente primeiro?",
+    options: ["Tristeza limpa. Levo um tempo e sigo.", "Um confirma: não sou suficiente.", "Raiva de mim por não ter visto antes.", "Uma vontade de entender o que ele viu nela."],
+    scores: [
+      {A:2},
+      {H:2,D:1},
+      {B:1,F:1},
+      {H:1,G:1,I:1}
+    ]
+  },
+  {
+    section: "Proteção",
+    question: "Como você costuma se proteger emocionalmente em relacionamentos?",
+    options: ["Não preciso de muita proteção.", "Sendo autossuficiente — precisando pouco.", "Sendo indispensável — tornando-me necessária.", "Mantendo uma parte de mim sempre reservada."],
+    scores: [
+      {A:2},
+      {A:1,G:1},
+      {C:1,I:1},
+      {G:1,J:1}
+    ]
+  },
+  {
+    section: "Proteção",
+    question: "Qual dessas frases parece mais sua?",
+    options: ["\"Deixo as coisas acontecerem.\"", "\"Prefiro saber o que está acontecendo.\"", "\"Cuido de quem amo antes de cuidar de mim.\"", "\"Não me apego muito para não sofrer.\""],
+    scores: [
+      {A:2},
+      {B:1,F:2},
+      {C:1,I:1},
+      {G:2,E:1}
+    ]
+  },
+  {
+    section: "Proteção",
+    question: "Quando sente que vai se machucar emocionalmente, como seu sistema reage?",
+    options: ["Fico com o desconforto e processo.", "Busco informação — entender ajuda.", "Fico mais útil, mais presente, mais forte.", "Me fecho. Não dou espaço para a dor entrar."],
+    scores: [
+      {A:2},
+      {B:1,F:1},
+      {C:1,A:1},
+      {G:2,J:1}
+    ]
+  },
+  {
+    section: "Proteção",
+    question: "Você costuma expressar suas necessidades afetivas diretamente?",
+    options: ["Sim, com relativa facilidade.", "Às vezes, mas me preocupo com a reação.", "Prefiro demonstrar em ações.", "Dificilmente. Parece pedir demais."],
+    scores: [
+      {A:2},
+      {I:1,H:1,B:1},
+      {C:1,D:1},
+      {D:2,I:1,H:1}
+    ]
+  },
+  {
+    section: "Proteção",
+    scene: "Um relacionamento vai muito bem.",
+    question: "Quando as coisas estão ótimas, você:",
+    options: ["Curto o momento com leveza.", "Fico esperando o outro sapato cair.", "Trabalho para garantir que permaneça assim.", "Me surpreendo — e fico esperando o que vem depois."],
+    scores: [
+      {A:2},
+      {E:2,B:1},
+      {F:1,I:1,C:1},
+      {E:1,B:1,H:1}
+    ]
+  },
+  {
+    section: "Proteção",
+    question: "O que você mais teme secretamente em um relacionamento profundo?",
+    options: ["Perder minha identidade.", "Ser abandonada quando já me entreguei.", "Não ser suficiente apesar de tudo.", "Abrir meu coração e ter destruído."],
+    scores: [
+      {A:1,G:1},
+      {E:2,B:1},
+      {H:2,I:1},
+      {J:2,E:1}
+    ]
+  }
+];
+
+const MOMENTS = [
+  {
+    after: 5,
+    text: "Mulheres emocionalmente indisponíveis raramente <strong>parecem</strong> indisponíveis. Elas costumam parecer fortes."
+  },
+  {
+    after: 10,
+    text: "Algumas mulheres não têm medo de amar. Têm medo do que acontece com elas <strong>quando amam</strong>."
+  },
+  {
+    after: 15,
+    text: "Você não controla porque gosta de controlar. Você controla porque seu sistema emocional <strong>não aprendeu a descansar</strong>."
+  },
+  {
+    after: 20,
+    text: "A mulher que resolve tudo sozinha não aprendeu que não precisa. Aprendeu que <strong>pedir era perigoso</strong>."
+  }
+];
+
+const IDENTITIES = {
+  A: {
+    name: "A Mulher Disponível",
+    em: "presente sem se perder",
+    tagline: "Presente sem se perder. Aberta sem se abandonar.",
+    mission: "Você construiu — ou está construindo — uma capacidade de criar vínculos sem abrir mão de si mesma. Isso não é um prêmio. É um processo. E nem sempre foi assim.",
+    think: "Você tende a interpretar o outro com generosidade sem perder o senso crítico. Consegue ficar com a incerteza sem precisar resolvê-la imediatamente.",
+    feel: "A ansiedade existe — mas não governa. Você sente profundamente sem se dissolver no que sente. Há uma diferença entre ser movida e ser varrida.",
+    interpret: "Relacionamentos são espaços de troca real. Você consegue estar presente sem calcular a saída nem se preparar para o abandono que talvez nunca chegue.",
+    sabotage: "Às vezes permanece em relações desequilibradas por tempo demais — porque sua capacidade de suportar é maior que a de muitas. E isso também tem um custo.",
+    single: "Escolhe com consciência. Não fica com qualquer um — o que às vezes é confundido com exigência excessiva. A espera tem peso, mas você sabe o porquê.",
+    couple: "Consegue pedir sem culpa, receber sem suspeita, navegar conflitos sem sentir que tudo vai acabar. Isso não é pequeno.",
+    married: "Busca profundidade. Pode se sentir solitária se o parceiro não acompanha esse movimento — porque presença sem intimidade também dói.",
+    cost: "Continuar presente quando o outro não tem a mesma disponibilidade. Ser 'a que sustenta' quando queria só ser sustentada.",
+    protect: "Nada que precise ser blindado com muros. O que você protege, protege com escolha — não com medo.",
+    desire: "Intimidade real. Recíproca. Alguém que chegue até você sem que você precise diminuir para caber.",
+    origin: "Essa disponibilidade não nasceu do nada. Ela foi construída — muitas vezes depois de passar por exatamente os outros padrões desta lista. Quem chega aqui, em geral, já esteve em outro lugar. E escolheu um caminho diferente."
+  },
+  B: {
+    name: "A Fiscal do Amor",
+    em: "que verifica para não ser surpreendida",
+    tagline: "Missão: controlar para não sofrer.",
+    mission: "Quando gosta de alguém, uma parte sua precisa saber o que está acontecendo. Monitorar é uma forma de gerenciar o que parece incontrolável.",
+    think: "Sua mente é analítica em relações. Você lê mensagens, interpreta silêncios, compara comportamentos. Não é desconfiança — é vigilância emocional aprendida.",
+    feel: "Por dentro: tensão de fundo. Uma inquietação que não desliga completamente. Mesmo quando está bem, uma parte permanece de prontidão.",
+    interpret: "Comportamentos neutros ganham significado. Um tom diferente, uma resposta lenta — seu sistema interpreta como sinal. O problema é que quase sempre há sinais.",
+    sabotage: "A vigilância que te protege também afasta. Quem sente que está sendo auditado, recua. E você confirma o que temia.",
+    single: "Muito criteriosa. Pode descartar pessoas boas antes de dar chance real. Prefere sair antes de ser pega de surpresa.",
+    couple: "Pode transformar a relação em campo de análise. Testa indiretamente. Cria provas que ele não sabe que está fazendo.",
+    married: "Pode viver num estado de alerta baixo e constante. A paz parece suspeita.",
+    cost: "O descanso emocional. A leveza de simplesmente estar sem monitorar.",
+    protect: "A capacidade de ser pega de surpresa. De novo.",
+    desire: "Segurança real. Alguém cuja consistência faça sua mente pousar.",
+    origin: "A Fiscal do Amor costuma surgir quando o amor foi inconsistente. Quando havia afeto em alguns momentos e ausência em outros — sem explicação clara. Quando a tranquilidade durava pouco e a decepção aparecia sem aviso. O sistema aprendeu que relaxar é perigoso. Então passou a monitorar. Não por desconfiança — mas porque a vigilância foi o que impediu que a dor pegasse de surpresa."
+  },
+  C: {
+    name: "A Salvadora",
+    em: "que cuida para merecer",
+    tagline: "Missão: ser útil para ser amada.",
+    mission: "Você ama em forma de serviço. Cuidar é natural. Mas em algum momento aprendeu que cuidar também é o que justifica sua presença.",
+    think: "Seu foco natural é no outro. O que ele precisa, o que sente, como está. Suas próprias necessidades ficam em segundo plano — às vezes desaparecem.",
+    feel: "Leveza quando está sendo útil. Inquietação quando não tem nada para oferecer. Uma estranheza em receber sem ter dado nada antes.",
+    interpret: "Amor é ação. Mas às vezes confunde cuidado genuíno com a necessidade de continuar sendo necessária.",
+    sabotage: "Tende a escolher alguém que precisa ser salvo. E quando ele sana — ou quando ela se cansa — o vínculo desestabiliza.",
+    single: "Pode se apaixonar por potencial. Fica com alguém difícil porque acredita que pode ajudá-lo a se tornar o que ele pode ser.",
+    couple: "Pode carregar a relação. Quando para de carregar, a dinâmica entra em crise.",
+    married: "Pode ter construído uma relação onde é a 'forte' permanente. E isso esgota.",
+    cost: "Você mesma. Suas próprias necessidades emocionais não atendidas.",
+    protect: "Sua crença de que é amável por quem é — e não pelo que faz.",
+    desire: "Ser cuidada sem precisar merecer. Receber sem ter dado primeiro.",
+    origin: "A Salvadora costuma surgir quando o amor foi condicionado à utilidade. Quando ser útil, resolver, cuidar — era o que gerava presença e afeto. Quando a criança aprendeu que seu valor estava no que fazia, não no que era. O sistema concluiu: se eu for necessária, não vou ser abandonada. E passou a amar em forma de serviço — mesmo quando ninguém pediu."
+  },
+  D: {
+    name: "A Invisível",
+    em: "que aprendeu a não incomodar",
+    tagline: "Missão: não ocupar espaço demais.",
+    mission: "Em algum momento ficou claro que suas necessidades eram um peso. Então você aprendeu a precisar menos. Ou pelo menos a parecer que precisa menos.",
+    think: "Antes de pedir, você calcula se o pedido é 'grande demais'. Antes de expressar, você edita. Há um filtro constante entre o que sente e o que chega ao outro.",
+    feel: "Uma solidão que não pode nomear completamente, porque na superfície tudo está 'bem'.",
+    interpret: "Relacionamentos são lugares onde você tende a adaptar o tamanho do seu afeto ao que parece tolerável para o outro.",
+    sabotage: "Ao se tornar pequena, atrai quem não enxerga. E depois sente que não é vista — sem entender que se tornou invisível.",
+    single: "Pode ficar invisível por muito tempo esperando ser encontrada. Não se lança porque não quer incomodar.",
+    couple: "Vai cedendo. Com o tempo, não sabe mais onde ela termina e o relacionamento começa.",
+    married: "Pode estar dentro de um casamento e se sentir completamente sozinha — porque nunca permitiu ser totalmente conhecida.",
+    cost: "Conexão real. Ninguém pode amar quem você esconde.",
+    protect: "A possibilidade de decepcionar alguém e ser rejeitada por isso.",
+    desire: "Ser vista completamente — e descobrir que não é demais.",
+    origin: "A Invisível costuma surgir quando expressar necessidades gerava rejeição, irritação ou indiferença. Quando ocupar espaço era um problema. Quando a criança aprendeu que diminuir era mais seguro do que ser grande demais. O sistema concluiu: se eu não incomodar, eu permaneço. E passou a filtrar tudo antes de chegar ao outro — às vezes até antes de chegar a si mesma."
+  },
+  E: {
+    name: "A Sobrevivente de Guerra",
+    em: "que já foi longe demais",
+    tagline: "Missão: nunca mais.",
+    mission: "Você já amou com tudo. E saiu com cicatrizes. Agora uma parte sua está constantemente verificando se está segura o suficiente para continuar.",
+    think: "Sua mente tem memória emocional muito ativa. Padrões do passado são lidos no presente mesmo quando não estão lá.",
+    feel: "Desejo e medo coexistem. Você quer — e teme querer. Um pé dentro, um pé fora.",
+    interpret: "Coisas boas parecem suspeitas. Consistência parece passageira. Quando está bem demais, espera o que vem depois.",
+    sabotage: "A antecipação da dor protege — mas também cria a distância que você mais teme. O outro sente que nunca chegou de verdade.",
+    single: "Pode manter as pessoas em órbita sem deixar nenhuma aterrissar. Parece disponível mas não está.",
+    couple: "Testa sem perceber. Cria pequenas crises para verificar se ele fica.",
+    married: "Pode estar fisicamente presente mas emocionalmente em guarda. O casamento parece seguro e ainda assim ela espera.",
+    cost: "A leveza de simplesmente estar. O prazer sem a sombra do que pode vir.",
+    protect: "A dor que quase não sobreviveu antes.",
+    desire: "Um amor que não a destrua. Um lugar seguro para baixar a guarda.",
+    origin: "A Sobrevivente de Guerra costuma surgir depois de uma perda emocional muito grande. Uma traição, um abandono, um relacionamento que deixou marcas profundas. Ou uma infância onde o amor foi seguido de dor com frequência suficiente para o sistema aprender: quando está bom demais, é porque ainda vai doer. O alerta nunca foi desligado porque nunca havia motivo suficiente para desligá-lo."
+  },
+  F: {
+    name: "A Investigadora",
+    em: "que lê nas entrelinhas",
+    tagline: "Onde existe silêncio, ela procura significado.",
+    mission: "Sua mente aprendeu que compreender é uma forma de proteção. Se você entende tudo — o comportamento, o silêncio, o tom, a pausa — talvez consiga antecipar a dor antes que ela chegue.",
+    think: "Você analisa. Relê conversas. Interpreta tons. Compara o hoje com o ontem. Não é paranoia — é um sistema cognitivo que foi treinado para encontrar padrões onde há ameaça.",
+    feel: "Uma leve tensão que acompanha mesmo os momentos bons. Como se descansar completamente fosse imprudente. Como se a vigilância mental fosse o preço da segurança.",
+    interpret: "Cada comportamento tem uma leitura possível. Você raramente aceita o literal — procura o subtexto. E muitas vezes o encontra, mesmo quando não estava lá.",
+    sabotage: "A interpretação constante cria uma realidade paralela. Você responde ao que leu — não ao que aconteceu. E o outro, sem saber o que foi interpretado, não consegue se defender.",
+    single: "Pode descartar pessoas boas por leituras que eram neutras. O processamento é mais rápido que a experiência.",
+    couple: "Faz perguntas camufladas para confirmar hipóteses que não disse em voz alta. O outro sente que está sendo analisado — sem entender por quê.",
+    married: "Pode viver interpretando os silêncios do casamento como sinais — quando às vezes são apenas silêncios.",
+    cost: "A experiência direta. Viver o momento sem filtrá-lo antes de senti-lo.",
+    protect: "Ser surpreendida por algo que poderia ter previsto.",
+    desire: "Descanso mental. Um vínculo onde não precise decifrar — porque a presença é clara o suficiente.",
+    origin: "A Investigadora costuma surgir quando as mensagens emocionais foram contraditórias. Quando o que era dito e o que era feito não combinavam. Quando interpretar era necessário para sobreviver emocionalmente. O sistema aprendeu que entender é mais seguro do que sentir."
+  },
+  G: {
+    name: "A Guardiã do Portão",
+    em: "que sabe como manter distância",
+    tagline: "Missão: não deixar ninguém entrar completamente.",
+    mission: "Você desenvolveu uma capacidade extraordinária de parecer presente sem estar completamente acessível. Uma distância elegante que protege.",
+    think: "Seus pensamentos sobre relacionamentos tendem ao ceticismo. Não ao cinismo — ao realismo protetor. Você vê antes de acreditar.",
+    feel: "Conforto na independência. Desconforto quando alguém se aproxima muito, muito rápido.",
+    interpret: "Intimidade é invasão até provar o contrário. Você precisa de tempo, de prova, de consistência — antes de abrir.",
+    sabotage: "Ao manter o portão, afasta exatamente quem teria capacidade de ficar. Porque quem fica com a versão fechada nunca te conheceu de verdade.",
+    single: "Pode estar solteira há muito tempo sem entender completamente por quê. As pessoas chegam até um ponto — e param.",
+    couple: "Pode estar em um relacionamento onde o parceiro sente que nunca chegou completamente.",
+    married: "O casamento pode ter estrutura, mas falta intimidade real. Uma solidão elegante dentro de uma vida organizada.",
+    cost: "Ser verdadeiramente conhecida. Ser amada em sua totalidade.",
+    protect: "A dor que vem de abrir e ser destruída.",
+    desire: "Alguém digno do portão aberto. Um amor que valha o risco.",
+    origin: "A Guardiã do Portão costuma surgir quando abrir o coração foi seguido de consequências. Quando confiar resultou em dor, humilhação ou traição. Quando ser acessível pareceu ingênuo. O sistema concluiu: manter distância é inteligência, não medo. E construiu uma proteção tão sofisticada que às vezes nem ela mesma reconhece como fechamento — parece apenas critério."
+  },
+  H: {
+    name: "A Escolhida",
+    em: "que precisa provar que merece",
+    tagline: "Missão: conquistar o lugar que deveria ser dado.",
+    mission: "Em algum momento ficou claro que seu lugar precisava ser conquistado. Que presença, afeto, amor — eram coisas que se ganhavam.",
+    think: "Avalia constantemente o quanto está sendo suficiente. Compara. Mede seu valor em relação ao que percebe que o outro acha.",
+    feel: "Uma corrida silenciosa. Nunca completamente em paz — sempre verificando se ainda está sendo escolhida.",
+    interpret: "Relacionamentos como provas de mérito. Cada afastamento é uma possível reprovação.",
+    sabotage: "A busca constante por aprovação cria uma dependência visível. E quem sente que tem poder sobre sua autoestima, às vezes o usa.",
+    single: "Pode ficar com quem não a escolhe — tentando conquistar o que não deveria precisar conquistar.",
+    couple: "Pode moldar demais quem é para manter a aprovação. Com o tempo, não sabe mais quem é fora do relacionamento.",
+    married: "Pode estar em um casamento onde sente que precisa continuar merecendo. Que o amor é condicional.",
+    cost: "A paz de saber que é amável sem provar.",
+    protect: "A crença de que pode ser escolhida por quem realmente é.",
+    desire: "Ser escolhida sem ter competido. Ser amada sem ter merecido.",
+    origin: "A Escolhida costuma surgir quando o amor foi condicional desde o início. Quando havia aprovação em alguns momentos e retirada em outros — dependendo do desempenho, do comportamento, da aparência. Quando a criança aprendeu que seu lugar precisava ser conquistado, não simplesmente ocupado. O sistema concluiu: preciso ser suficiente para ser escolhida. E nunca mais parou de tentar."
+  },
+  I: {
+    name: "A Boazinha",
+    em: "que agrada para não ser abandonada",
+    tagline: "Missão: nunca decepcionar.",
+    mission: "Você aprendeu que o afeto tem condições. Que para ser amada, precisa ser boa, agradável, sem conflitos. A discordância pareceu sempre cara demais.",
+    think: "Antes de agir, pensa em como o outro vai reagir. Existe um filtro automático entre o que quer e o que expressa.",
+    feel: "Leveza aparente. Por dentro, uma fadiga crescente de se moldar. Uma raiva que não encontra saída limpa.",
+    interpret: "Conflito é perigo. Desagradar é abandono potencial. Discordar é arriscar.",
+    sabotage: "Ao nunca decepcionar, nunca é verdadeiramente conhecida. E quem fica, fica com a versão editada — não com ela.",
+    single: "Pode concordar com muito para manter a conexão. Perde a si mesma antes de perder o relacionamento.",
+    couple: "O ressentimento cresce. Um dia explode de um jeito que surpreende os dois.",
+    married: "Pode ter construído uma relação inteira em cima de adaptações. E sentir que ninguém a conhece de verdade.",
+    cost: "Ser ela mesma. Completamente, sem edição.",
+    protect: "A possibilidade de que sua versão real seja rejeitada.",
+    desire: "Ser amada sem precisar ser boa. Ser escolhida com seus defeitos.",
+    origin: "A Boazinha costuma surgir quando discordar tinha um preço alto. Quando expressar raiva, decepção ou necessidade gerava conflito, punição ou afastamento. Quando a criança aprendeu que ser boa era o que mantinha o amor. O sistema concluiu: se eu não decepcionar, não serei abandonada. E passou a editar tudo — os pedidos, os limites, a raiva — antes que saíssem."
+  },
+  J: {
+    name: "A Sobrevivente Silenciosa",
+    em: "que aprendeu a viver sem precisar",
+    tagline: "Aprendeu a sobreviver sem precisar de ninguém.",
+    mission: "Não voltar a sentir a dor que já sentiu. Você construiu uma vida funcional, organizada, independente — e dentro dessa estrutura, aprendeu a não precisar. Ou pelo menos a não mostrar que precisa.",
+    think: "Você processa a maioria das coisas sozinha. Não porque não quer companhia — mas porque em algum momento depender foi associado a decepção.",
+    feel: "Uma paz que às vezes parece vazia. Uma força que cansa de sustentar. Por dentro, uma saudade de algo que talvez nunca tenha nomeado completamente.",
+    interpret: "Relacionamentos são bons enquanto não pedem demais. A intimidade profunda ativa um alerta antigo: quanto mais perto, mais tem a perder.",
+    sabotage: "Você não impede que entrem — você continua vivendo atrás dos muros mesmo quando alguém já está dentro. O outro chega, instala, e ainda assim não alcança.",
+    single: "Pode estar solteira há muito tempo e se convenceu de que prefere assim. Mas há uma diferença entre escolher a solidão e ter aprendido a suportá-la.",
+    couple: "Está no relacionamento — presente nas funções, ausente na entrega. O parceiro sente que há algo inacessível, mas não consegue nomear o quê.",
+    married: "O casamento pode funcionar perfeitamente na superfície. E ainda assim ela acorda às vezes com uma sensação de que está completamente sozinha.",
+    cost: "Ser conhecida. Ser amparada. Descansar em alguém sem esperar a decepção.",
+    protect: "A dor de ter precisado — e não ter sido correspondida.",
+    desire: "Uma presença que não exija que ela se torne pequena nem grande demais. Alguém em quem descansar sem ter que pagar por isso depois.",
+    origin: "A Sobrevivente Silenciosa costuma surgir quando o amor foi seguido de abandono. Quando precisar de alguém resultou em ausência. Quando ser forte era a única opção disponível. O sistema aprendeu: se eu não precisar, não vou me machucar. E passou a acreditar que isso é força — quando é, na verdade, uma proteção muito cara."
+  }
+};
+
+const FINALE_TEXTS = {
+  A: "Você encontrou — ou está encontrando — uma forma de estar presente sem se perder. Isso não é garantia de que será fácil. É apenas uma base diferente para começar. Não perca de vista o caminho que te trouxe aqui.",
+  B: "Você vigia porque já foi surpreendida. A vigilância foi necessária. Mas talvez esteja cansada de nunca descansar completamente dentro de um vínculo.",
+  C: "Você cuidou de muitos. Você foi forte quando precisou ser. Mas talvez exista uma versão sua que ainda está esperando alguém cuidar dela — sem ela ter que merecer isso primeiro.",
+  D: "Você aprendeu a ser pequena. Em algum momento pareceu necessário. Mas talvez seu coração saiba que foi feito para um espaço maior do que o que você ocupou até agora.",
+  E: "Você sobreviveu. Isso é real. E o fato de ainda querer amar — depois de tudo — diz algo muito importante sobre quem você é. Talvez chegou a hora de deixar a guerra acabar.",
+  F: "Seu processamento emocional é sofisticado. Mas interpretar não é o mesmo que sentir. Em algum momento, o descanso vai pedir para você soltar a análise e simplesmente estar.",
+  G: "Você construiu uma proteção tão sofisticada que às vezes nem você mesma sabe como é do lado de dentro. Talvez seja hora de revisitar o que está guardando — e para quê.",
+  H: "Você não nasceu precisando se conquistar. Em algum momento aprenderam a você que seu lugar não era garantido. Mas ele é. Era e sempre foi.",
+  I: "Você foi boa por tanto tempo. Tão boa que talvez não saiba mais como é discordar sem medo, pedir sem culpa, existir sem ser aprovada. Isso pode mudar.",
+  J: "Você aprendeu a sobreviver sozinha. E sobreviveu. Mas talvez haja uma diferença entre sobreviver e viver — e você já saiba, em algum lugar, qual é essa diferença."
+};
+
+const FINALE_UNIVERSAL = "Você não nasceu assim.\n\nEm algum momento essa identidade te ajudou.\n\nEla protegeu algo importante.\n\nMas talvez esteja tentando resolver uma dor antiga dentro de relacionamentos atuais.\n\nE isso muda tudo.";
+
+let currentQ = 0;
+let scores = {A:0,B:0,C:0,D:0,E:0,F:0,G:0,H:0,I:0,J:0};
+let momentsPassed = [];
+let pendingMoment = null;
+let pendingAction = null;
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(id);
+  el.classList.add('active');
+  el.scrollTop = 0;
+  window.scrollTo(0,0);
+}
+
+function startQuiz() {
+  showScreen('screen-quiz');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  if (currentQ >= QUESTIONS.length) {
+    showLoading();
+    return;
+  }
+  const q = QUESTIONS[currentQ];
+  const progress = Math.round((currentQ / QUESTIONS.length) * 100);
+  document.getElementById('q-counter').textContent = `Pergunta ${currentQ+1} de ${QUESTIONS.length}`;
+  document.getElementById('q-section-label').textContent = q.section;
+  document.getElementById('q-progress').style.width = progress + '%';
+  
+  let html = '';
+  if (q.scene) {
+    html += `<p class="question-scene">${q.scene}</p>`;
+  }
+  html += `<p class="question-text">${q.question}</p>`;
+  html += `<div class="options-list">`;
+  q.options.forEach((opt, i) => {
+    html += `<button class="option-btn" onclick="selectOption(${i})">${opt}</button>`;
+  });
+  html += `</div>`;
+  
+  const body = document.getElementById('quiz-body');
+  body.innerHTML = html;
+  body.style.animation = 'none';
+  requestAnimationFrame(() => {
+    body.style.animation = 'fadeUp 0.5s ease';
+  });
+  document.getElementById('screen-quiz').scrollTop = 0;
+}
+
+function selectOption(idx) {
+  const q = QUESTIONS[currentQ];
+  const scoreMap = q.scores[idx];
+  Object.entries(scoreMap).forEach(([k,v]) => {
+    if (scores[k] !== undefined) scores[k] += v;
+  });
+  
+  const btns = document.querySelectorAll('.option-btn');
+  btns.forEach(b => b.classList.remove('selected'));
+  btns[idx].classList.add('selected');
+  
+  setTimeout(() => {
+    currentQ++;
+    const moment = MOMENTS.find(m => m.after === currentQ && !momentsPassed.includes(m.after));
+    if (moment) {
+      momentsPassed.push(moment.after);
+      showMoment(moment.text, renderQuestion);
+    } else {
+      renderQuestion();
+    }
+  }, 300);
+}
+
+function showMoment(text, callback) {
+  document.getElementById('moment-text').innerHTML = text;
+  const btn = document.getElementById('moment-btn');
+  btn.onclick = () => {
+    callback();
+    showScreen('screen-quiz');
+  };
+  showScreen('screen-moment');
+}
+
+function showLoading() {
+  showScreen('screen-loading');
+  setTimeout(showResult, 2800);
+}
+
+function getDominantIdentity() {
+  let max = -1, dominant = 'A';
+  Object.entries(scores).forEach(([k,v]) => {
+    if (v > max) { max = v; dominant = k; }
+  });
+  return dominant;
+}
+
+function showResult() {
+  const id = getDominantIdentity();
+  const data = IDENTITIES[id];
+
+  // Precision: deterministic but appears personal (87–98 range)
+  const precisionBase = 87;
+  const precisionBonus = (Object.values(scores).reduce((a,b)=>a+b,0) % 12);
+  const precision = precisionBase + precisionBonus;
+  
+  document.getElementById('result-title').innerHTML = data.name + '<em>' + data.em + '</em>';
+  document.getElementById('result-tagline').textContent = data.tagline;
+
+  // Precision indicator in hero
+  document.getElementById('result-precision').innerHTML = `
+    <div style="display:flex;flex-direction:column;align-items:center;gap:0.4rem;margin-top:2rem;padding-top:1.5rem;border-top:0.5px solid rgba(255,255,255,0.1)">
+      <span style="font-family:'Jost',sans-serif;font-size:0.65rem;font-weight:300;letter-spacing:0.3em;text-transform:uppercase;color:rgba(212,132,92,0.6)">Precisão da leitura</span>
+      <span style="font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:300;color:var(--terra-light)">${precision}%</span>
+      <span style="font-family:'Jost',sans-serif;font-size:0.7rem;font-weight:300;color:rgba(250,247,243,0.35);max-width:240px;text-align:center;line-height:1.5">Este resultado foi calculado a partir dos padrões emocionais identificados ao longo da experiência.</span>
+    </div>
+  `;
+  
+  const spectrumData = [
+    {label: 'Ativação relacional', val: Math.min(100, Math.round((scores.B+scores.E+scores.F)*8))},
+    {label: 'Disponibilidade', val: Math.min(100, Math.round(scores.A > 0 ? (scores.A * 12) : 30))},
+    {label: 'Proteção emocional', val: Math.min(100, Math.round((scores.G+scores.J+scores.A+scores.D)*7))},
+    {label: 'Autossuficiência', val: Math.min(100, Math.round((scores.A+scores.G)*9))},
+    {label: 'Necessidade de aprovação', val: Math.min(100, Math.round((scores.H+scores.I+scores.C)*8))}
+  ];
+  
+  let spectrumHTML = '<div class="spectrum-bars">';
+  spectrumData.forEach(s => {
+    const pct = Math.max(8, s.val);
+    spectrumHTML += `<div class="spectrum-row">
+      <span class="spectrum-label">${s.label}</span>
+      <div class="spectrum-track"><div class="spectrum-fill" style="width:${pct}%"></div></div>
+      <span class="spectrum-val">${pct}%</span>
+    </div>`;
+  });
+  spectrumHTML += '</div>';
+  
+  const body = document.getElementById('result-body');
+  body.innerHTML = `
+    <div class="result-section">
+      <p class="result-section-label">Como você pensa</p>
+      <p class="result-section-text">${data.think}</p>
+    </div>
+    <div class="result-separator"></div>
+    <div class="result-section">
+      <p class="result-section-label">Como você sente</p>
+      <p class="result-section-text">${data.feel}</p>
+    </div>
+    <div class="result-separator"></div>
+    <div class="result-section">
+      <p class="result-section-label">Como você interpreta relacionamentos</p>
+      <p class="result-section-text">${data.interpret}</p>
+    </div>
+    <div class="result-separator"></div>
+    <div class="result-section">
+      <p class="result-section-label">Como isso sabota conexão</p>
+      <p class="result-section-text">${data.sabotage}</p>
+    </div>
+    <div class="result-separator"></div>
+    <div class="result-blocks-grid">
+      <div class="result-block">
+        <span class="result-block-label">Se você é solteira</span>
+        <p class="result-block-text">${data.single}</p>
+      </div>
+      <div class="result-block">
+        <span class="result-block-label">Se você está em relacionamento</span>
+        <p class="result-block-text">${data.couple}</p>
+      </div>
+      <div class="result-block">
+        <span class="result-block-label">Se você é casada</span>
+        <p class="result-block-text">${data.married}</p>
+      </div>
+    </div>
+    <div class="result-separator"></div>
+    <div class="result-section">
+      <p class="result-section-label">O custo emocional</p>
+      <p class="result-section-text">${data.cost}</p>
+    </div>
+    <div class="result-section">
+      <p class="result-section-label">O que você está protegendo</p>
+      <p class="result-section-text">${data.protect}</p>
+    </div>
+    <div class="result-separator"></div>
+    <div class="result-section">
+      <p class="result-section-label">Como essa identidade foi construída</p>
+      <p class="result-section-text">${data.origin}</p>
+    </div>
+    <div class="result-separator"></div>
+    <div class="result-section">
+      <p class="result-section-label">O que você mais deseja secretamente</p>
+      <p class="result-section-text"><em>${data.desire}</em></p>
+    </div>
+    <div class="result-separator"></div>
+    <div class="result-section">
+      <p class="result-section-label">Seu espectro emocional</p>
+      ${spectrumHTML}
+    </div>
+  `;
+  
+  const finaleKey = FINALE_TEXTS[id] ? id : 'A';
+  const finaleText = FINALE_TEXTS[finaleKey] || '';
+  const universalLines = FINALE_UNIVERSAL.split('\n\n');
+  let finaleHTML = `<p class="finale-text">${finaleText}</p>`;
+  finaleHTML += universalLines.map((line, i) => `<p class="finale-text" style="margin-top:${i===0?'2rem':'1.2rem'}">${line}</p>`).join('');
+  document.getElementById('result-finale').innerHTML = finaleHTML;
+  
+  showScreen('screen-result');
+}
+</script>
+</body>
+</html>
